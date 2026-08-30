@@ -1,138 +1,337 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Javascript 2</title>
+const btnInsertUpdate = document.getElementById("btnInsertUpdate");
+const btnClearItems = document.getElementById("btnClearItems");
+const btnClear = document.getElementById("btnClear");
+const tblRecords = document.getElementById("tblRecords");
 
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
+let arrRecords = new Array();
+
+const tblTHsLabels = [
+    "First Name",
+    "Middle Name",
+    "Last Name",
+    "Age",
+    "Action"
+];
+
+
+const savedRecords = localStorage.getItem("arrRecords");
+
+if (savedRecords != null) {
+    arrRecords = JSON.parse(savedRecords);
+}
+
+
+if (arrRecords.length == 0) {
+    document.getElementById("status").style.display = "inline";
+    document.getElementById("status").innerHTML = "No Records...";
+} else {
+    document.getElementById("status").style.display = "none";
+}
+
+
+iterateRecords();
+
+
+btnInsertUpdate.addEventListener("click", () => {
+
+    const inputTxt = document.getElementsByTagName("input");
+
+    if (btnInsertUpdate.value == "insert") {
+
+        for (const txt of inputTxt) {
+
+            if (txt.value.trim() == "") {
+                alert("Please complete all the text inputs!");
+                return;
+            }
+
         }
 
-        input {
-            width: 110px;
+
+        let infoRecord = {
+
+            fname: inputTxt[0].value,
+            mname: inputTxt[1].value,
+            lname: inputTxt[2].value,
+            age: parseInt(inputTxt[3].value)
+
+        };
+
+
+        for (const txt of inputTxt) {
+            txt.value = "";
         }
 
-        button {
-            cursor: pointer;
+
+        arrRecords.push(infoRecord);
+
+        iterateRecords();
+
+        console.log(inputTxt);
+        console.log(infoRecord);
+        console.log(arrRecords);
+
+    } else {
+
+        for (const txt of inputTxt) {
+
+            if (txt.value.trim() == "") {
+                alert("Please complete all the text inputs!");
+                return;
+            }
+
         }
 
-        #tblRecords {
-            border-collapse: collapse;
-            margin: auto;
+
+        const index = parseInt(btnInsertUpdate.value);
+
+
+        arrRecords[index].fname = inputTxt[0].value;
+        arrRecords[index].mname = inputTxt[1].value;
+        arrRecords[index].lname = inputTxt[2].value;
+        arrRecords[index].age = parseInt(inputTxt[3].value);
+
+
+        iterateRecords();
+
+
+        for (const txt of inputTxt) {
+            txt.value = "";
         }
 
-        #tblRecords th,
-        #tblRecords td {
-            border-bottom: 1px solid black;
-            padding: 6px 8px;
-            text-align: center;
+
+        btnInsertUpdate.innerHTML = "Insert";
+        btnInsertUpdate.value = "insert";
+
+    }
+
+});
+
+
+btnClear.addEventListener("click", () => {
+
+    const inputTxt = document.getElementsByTagName("input");
+
+    for (const txt of inputTxt) {
+        txt.value = "";
+    }
+
+    btnInsertUpdate.innerHTML = "Insert";
+    btnInsertUpdate.value = "insert";
+
+});
+
+
+btnClearItems.addEventListener("click", () => {
+
+    arrRecords = [];
+
+    // Remove Local Storage
+    localStorage.removeItem("arrRecords");
+
+
+    while (tblRecords.hasChildNodes()) {
+        tblRecords.removeChild(tblRecords.firstChild);
+    }
+
+
+    document.getElementById("status").style.display = "inline";
+    document.getElementById("status").innerHTML = "No Records...";
+
+
+    btnInsertUpdate.innerHTML = "Insert";
+    btnInsertUpdate.value = "insert";
+
+});
+
+function iterateRecords() {
+
+    while (tblRecords.hasChildNodes()) {
+        tblRecords.removeChild(tblRecords.firstChild);
+    }
+
+
+    if (!(arrRecords.length == 0)) {
+
+        document.getElementById("status").style.display = "none";
+
+
+        const tblHeaderRow = document.createElement("tr");
+        const tblHeader = document.createElement("thead");
+
+
+        tblHeaderRow.style.borderTop = "1px solid black";
+        tblHeaderRow.style.borderBottom = "1px solid black";
+
+
+        for (let i = 0; i < 5; i++) {
+
+            const tblTHs = document.createElement("th");
+
+            tblTHs.style.padding = "5px";
+
+
+            if (i != 4) {
+                tblTHs.style.borderRight = "1px solid black";
+            }
+
+
+            tblTHs.innerHTML = tblTHsLabels[i];
+
+            tblHeaderRow.appendChild(tblTHs);
+
         }
 
-        fieldset {
-            width: 700px;
-        }
 
-        #status {
-            color: red;
-            font-size: 12px;
-        }
-    </style>
-</head>
+        tblHeader.appendChild(tblHeaderRow);
+        tblRecords.appendChild(tblHeader);
 
-<body>
 
-    <h1>Javascript Web Output #2</h1>
+        const tblBody = document.createElement("tbody");
 
-    <table id="tblInput">
 
-        <tr>
-            <td width="45%">
-                <label for="txtFname">First Name:</label>
-            </td>
-            <td>
-                <input type="text" id="txtFname">
-            </td>
-        </tr>
+        arrRecords.forEach((rec, i) => {
 
-        <tr>
-            <td>
-                <label for="txtMname">Middle Name:</label>
-            </td>
-            <td>
-                <input type="text" id="txtMname">
-            </td>
-        </tr>
+            const tblRow = document.createElement("tr");
 
-        <tr>
-            <td>
-                <label for="txtLname">Last Name:</label>
-            </td>
-            <td>
-                <input type="text" id="txtLname">
-            </td>
-        </tr>
 
-        <tr>
-            <td>
-                <label for="txtAge">Age:</label>
-            </td>
-            <td>
-                <input type="number" id="txtAge">
-            </td>
-        </tr>
+            const tbdataFname = document.createElement("td");
+            const tbdataMname = document.createElement("td");
+            const tbdataLname = document.createElement("td");
+            const tbdataAge = document.createElement("td");
+            const tbdataActionBtn = document.createElement("td");
 
-        <tr style="height:20px;">
-            <td></td>
-            <td style="padding-top:15px;">
-                <button id="btnInsertUpdate" value="insert">
-                    Insert
-                </button>
 
-                <button id="btnClear">
-                    Clear
-                </button>
-            </td>
-        </tr>
+            const btnDelete = document.createElement("button");
+            const btnUpdate = document.createElement("button");
 
-    </table>
 
-    <br>
 
-    <fieldset>
-        <legend>Records</legend>
+            tbdataFname.style.borderRight = "1px solid black";
+            tbdataFname.style.padding = "10px";
 
-        <p id="status"></p>
+            tbdataMname.style.borderRight = "1px solid black";
+            tbdataMname.style.padding = "10px";
 
-        <table id="tblRecords">
-            <!-- Records will appear here -->
-        </table>
+            tbdataLname.style.borderRight = "1px solid black";
+            tbdataLname.style.padding = "10px";
 
-    </fieldset>
+            tbdataAge.style.borderRight = "1px solid black";
+            tbdataAge.style.padding = "10px";
 
-    <button id="btnClearItems" style="margin-top:10px;">
-        Clear Records
-    </button>
+            tbdataActionBtn.style.padding = "10px";
 
-    <label>Sort by:</label>
+            tblRow.style.borderBottom = "1px solid black";
 
-    <select id="sortBy">
-        <option value="lname">Last Name</option>
-        <option value="fname">First Name</option>
-        <option value="age">Age</option>
-    </select>
 
-    <select id="sortOrder">
-        <option value="asc">A-Z</option>
-        <option value="desc">Z-A</option>
-    </select>
+            tbdataFname.innerHTML = rec.fname;
+            tbdataMname.innerHTML = rec.mname;
+            tbdataLname.innerHTML = rec.lname;
+            tbdataAge.innerHTML = rec.age;
 
-    <button id="btnSave">
-        Save to Local Storage
-    </button>
 
-    <script src="main.js"></script>
+            btnDelete.innerHTML = "Delete";
 
-</body>
-</html>
+            btnDelete.setAttribute(
+                "onclick",
+                `deleteData(${i})`
+            );
+
+            btnDelete.style.marginRight = "5px";
+
+
+            btnUpdate.innerHTML = "Edit";
+
+            btnUpdate.setAttribute(
+                "value",
+                "update"
+            );
+
+            btnUpdate.setAttribute(
+                "onclick",
+                `updateData(${i})`
+            );
+
+            btnUpdate.style.marginRight = "5px";
+
+
+            tbdataActionBtn.appendChild(btnDelete);
+            tbdataActionBtn.appendChild(btnUpdate);
+
+
+            // =================================
+            // APPEND CELLS
+            // =================================
+
+            tblRow.appendChild(tbdataFname);
+            tblRow.appendChild(tbdataMname);
+            tblRow.appendChild(tbdataLname);
+            tblRow.appendChild(tbdataAge);
+            tblRow.appendChild(tbdataActionBtn);
+
+
+            tblBody.appendChild(tblRow);
+
+        });
+
+
+        tblRecords.appendChild(tblBody);
+
+
+    } else {
+
+        document.getElementById("status").style.display = "inline";
+        document.getElementById("status").innerHTML = "No Records...";
+
+    }
+
+}
+
+function deleteData(i) {
+
+    arrRecords.splice(i, 1);
+
+    iterateRecords();
+
+}
+
+
+
+function updateData(i) {
+
+    const inputTxt = document.getElementsByTagName("input");
+
+
+    inputTxt[0].value = arrRecords[i].fname;
+    inputTxt[1].value = arrRecords[i].mname;
+    inputTxt[2].value = arrRecords[i].lname;
+    inputTxt[3].value = arrRecords[i].age;
+
+
+    btnInsertUpdate.innerHTML = "Update";
+
+    btnInsertUpdate.value = `${i}`;
+
+}
+
+
+function saveToLocalStorage() {
+
+    localStorage.setItem(
+        "arrRecords",
+        JSON.stringify(arrRecords)
+    );
+
+    alert("Records saved to Local Storage!");
+
+}
+
+
+
+const btnSave = document.getElementById("btnSave");
+
+btnSave.addEventListener("click", () => {
+
+    saveToLocalStorage();
+
+});
